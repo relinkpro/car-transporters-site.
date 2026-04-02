@@ -17,7 +17,7 @@ type AvailabilityResult = {
   message: string;
 };
 
-const PHONE_NUMBER = '353872310';
+const PHONE_NUMBER = '353872310184';
 
 const TRAILERS: Trailer[] = [
   {
@@ -283,16 +283,19 @@ export default function Page() {
             Premium rugged trailer hire
           </div>
 
-          <h2 className="mt-6 max-w-4xl text-4xl font-bold leading-tight text-white md:text-6xl">
+          <h1 className="mt-6 max-w-4xl text-4xl font-bold leading-tight text-white md:text-6xl">
             Car transporter trailer hire in{' '}
             <span className="text-amber-300">Bunclody, Co. Wexford</span>
-          </h2>
+          </h1>
 
           <p className="mt-5 max-w-2xl text-lg leading-8 text-white/70">
-            
-            A practical local hire setup for cars, jeeps, vintage
-            vehicles and light machinery. Check dates online, then message directly
-            on WhatsApp for price and final confirmation.
+            A practical local hire setup for cars, jeeps, vintage vehicles and light
+            machinery. Check dates online, then message directly on WhatsApp for price
+            and final confirmation.
+          </p>
+
+          <p className="mt-3 text-white/60">
+            Based in Bunclody — covering Wexford and surrounding areas.
           </p>
 
           <div className="mt-8 flex flex-col gap-4 sm:flex-row">
@@ -308,7 +311,7 @@ export default function Page() {
               rel="noreferrer"
               className="rounded-2xl border border-white/10 bg-white/[0.03] px-6 py-3 text-center font-medium text-white transition hover:border-white/20 hover:bg-white/5"
             >
-              General WhatsApp enquiry
+              Message on WhatsApp to confirm booking and prices
             </a>
           </div>
 
@@ -436,7 +439,7 @@ export default function Page() {
                       rel="noreferrer"
                       className="rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-3 text-center font-medium text-white transition hover:border-white/20 hover:bg-white/5"
                     >
-                      WhatsApp enquiry
+                      Message on WhatsApp
                     </a>
                   </div>
                 </div>
@@ -537,6 +540,9 @@ export default function Page() {
             <p className="mt-4 max-w-xl text-white/70">
               Message directly on WhatsApp for price, availability confirmation and
               general hire enquiries.
+            </p>
+            <p className="mt-2 text-white/60">
+              Weekend bookings fill fast — message early.
             </p>
           </div>
 
