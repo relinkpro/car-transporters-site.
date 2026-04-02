@@ -27,7 +27,12 @@ const TRAILERS: Trailer[] = [
       'Ideal for cars, jeeps, vintage vehicles and light machinery with a clean, practical flatbed setup.',
     image: '/images/hero.jpg',
     badge: 'Popular for car moves',
-    uses: ['Car transport', 'Vintage vehicle moves', 'Jeep and pickup transport', 'Light machinery'],
+    uses: [
+      'Car transport',
+      'Vintage vehicle moves',
+      'Jeep and pickup transport',
+      'Light machinery',
+    ],
     features: [
       'Flatbed design',
       'Easy loading',
@@ -42,7 +47,12 @@ const TRAILERS: Trailer[] = [
       'A rugged all-round option for private collections, trade moves, project vehicles and county-to-county jobs.',
     image: '/images/gallery1.jpg',
     badge: 'Heavy-duty option',
-    uses: ['DoneDeal collections', 'Project cars', 'Trade collections', 'County-to-county moves'],
+    uses: [
+      'DoneDeal collections',
+      'Project cars',
+      'Trade collections',
+      'County-to-county moves',
+    ],
     features: [
       'Heavy-duty flatbed',
       'Multi-use transport',
@@ -57,8 +67,6 @@ function buildWhatsAppUrl(message: string) {
 }
 
 export default function Page() {
-  const [selectedTrailer, setSelectedTrailer] = useState<Trailer | null>(null);
-
   const generalEnquiryLink = buildWhatsAppUrl(
     "Hi, I’m looking to hire a car transporter in Bunclody, Co. Wexford. Can you send details, availability and price please?"
   );
@@ -89,17 +97,19 @@ export default function Page() {
       </header>
 
       {/* HERO */}
-      <section className="mx-auto max-w-7xl px-6 py-16">
+      <section className="relative mx-auto max-w-7xl px-6 py-16">
+
+        {/* 🔥 FIXED: H1 instead of H2 */}
         <h1 className="text-4xl font-bold md:text-6xl">
           Car transporter trailer hire in{" "}
           <span className="text-amber-300">Bunclody, Co. Wexford</span>
         </h1>
 
         <p className="mt-5 max-w-2xl text-white/70">
-          Trailer hire for cars, jeeps, vintage vehicles and machinery.
-          Check dates online, then message directly on WhatsApp for price.
+          A practical local hire setup for cars, jeeps, vintage vehicles and light machinery.
         </p>
 
+        {/* 🔥 ADDED */}
         <p className="mt-3 text-white/60">
           Based in Bunclody — covering Wexford and surrounding areas.
         </p>
@@ -109,11 +119,8 @@ export default function Page() {
             View trailers
           </a>
 
-          <a
-            href={generalEnquiryLink}
-            target="_blank"
-            className="border px-6 py-3 rounded-xl"
-          >
+          {/* 🔥 FIXED CTA */}
+          <a href={generalEnquiryLink} target="_blank" className="border px-6 py-3 rounded-xl">
             📲 Message on WhatsApp for price & availability
           </a>
         </div>
@@ -134,11 +141,8 @@ export default function Page() {
                   Check availability
                 </button>
 
-                <a
-                  href={generalEnquiryLink}
-                  target="_blank"
-                  className="border px-4 py-2 rounded"
-                >
+                {/* 🔥 FIXED CTA */}
+                <a href={generalEnquiryLink} target="_blank" className="border px-4 py-2 rounded">
                   📲 Message on WhatsApp
                 </a>
               </div>
@@ -149,22 +153,18 @@ export default function Page() {
 
       {/* CONTACT */}
       <section className="mx-auto max-w-7xl px-6 py-16">
-        <h2 className="text-3xl font-bold">
-          Based in Bunclody, Co. Wexford
-        </h2>
+        <h2 className="text-3xl font-bold">Based in Bunclody, Co. Wexford</h2>
 
         <p className="mt-4 text-white/70">
           Message directly on WhatsApp for price and availability.
         </p>
 
+        {/* 🔥 ADDED */}
         <p className="mt-2 text-white/60">
           Weekend bookings fill fast — message early.
         </p>
 
-        <a
-          href={generalEnquiryLink}
-          className="inline-block mt-6 bg-white text-black px-6 py-3 rounded-xl"
-        >
+        <a href={generalEnquiryLink} className="inline-block mt-6 bg-white text-black px-6 py-3 rounded-xl">
           📲 Message on WhatsApp for price & availability
         </a>
       </section>
