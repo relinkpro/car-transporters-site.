@@ -20,10 +20,9 @@ export async function getCalendarClient() {
     scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
   });
 
-  const authClient = await auth.getClient();
-
+  // ✅ FIX: pass auth directly (NOT authClient)
   return google.calendar({
     version: 'v3',
-    auth: authClient,
+    auth,
   });
 }
