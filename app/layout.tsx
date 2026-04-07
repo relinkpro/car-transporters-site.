@@ -13,10 +13,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Car Transporter Trailer Hire Bunclody Wexford",
+export const metadata = {
+  title: "Wexford Trailer Hire | Car Transporter Hire Bunclody",
   description:
-    "Car transporter trailers for hire in Bunclody, Co. Wexford. Check availability and WhatsApp to book.",
+    "Car transporter trailer hire in Bunclody, Co. Wexford. Cars, jeeps, vintage vehicles and machinery. Message on WhatsApp for price and availability.",
 };
 
 export default function RootLayout({
