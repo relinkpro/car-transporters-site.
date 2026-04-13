@@ -26,12 +26,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (!(trailerId in calendarMap)) {
+      return NextResponse.json(
+        { error: 'Invalid trailer ID.' },
+        { status: 400 }
+      );
+    }
+
     const calendarId = calendarMap[trailerId];
 
     if (!calendarId) {
       return NextResponse.json(
-        { error: 'Invalid trailer ID.' },
-        { status: 400 }
+        { error: 'Calendar not configured for this trailer.' },
+        { status: 500 }
       );
     }
 
