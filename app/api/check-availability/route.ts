@@ -4,8 +4,8 @@ import { getCalendarClient } from '@/lib/calendar';
 export const runtime = 'nodejs';
 
 const calendarMap: Record<string, string | undefined> = {
-  'flatbed-1': process.env.TRAILER_1_CALENDAR_ID,
-  'flatbed-2': process.env.TRAILER_2_CALENDAR_ID,
+  'trailer-1': process.env.TRAILER_1_CALENDAR_ID,
+  'trailer-2': process.env.TRAILER_2_CALENDAR_ID,
 };
 
 export async function POST(req: NextRequest) {
@@ -53,7 +53,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ available });
   } catch (error: any) {
-    console.error('Availability check failed:', error?.response?.data || error?.message || error);
+    console.error(
+      'Availability check failed:',
+      error?.response?.data || error?.message || error
+    );
 
     return NextResponse.json(
       {
