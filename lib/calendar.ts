@@ -1,28 +1,37 @@
 import { google } from 'googleapis';
 
 export async function getCalendarClient() {
-  const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY;
+  const email = process.env.GOOGLE_CLIENT_EMAIL;
+  const rawKey = process.env.GOOGLE_PRIVATE_KEY;
 
-  if (!clientEmail) {
-    throw new Error('Missing GOOGLE_CLIENT_EMAIL in .env.local');
+  console.log('[calendar] GOOGLE_CLIENT_EMAIL present:', !!email);
+  console.log('[calendar] GOOGLE_PRIVATE_KEY present:', !!rawKey);
+  console.log('[calendar] Key begins correctly:', rawKey?.includes('BEGIN PRIVATE KEY'));
+  console.log('[calendar] Key ends correctly:', rawKey?.includes('END PRIVATE KEY'));
+
+  if (!email || !rawKey) {
+    throw new Error(
+      `Missing Google credentials — CLIENT_EMAIL: ${!!email}, PRIVATE_KEY: ${!!rawKey}`
+    );
   }
 
-  if (!privateKey) {
-    throw new Error('Missing GOOGLE_PRIVATE_KEY in .env.local');
-  }
+  const key = rawKey.replace(/\\n/g, '\n');
 
-  const auth = new google.auth.GoogleAuth({
-    credentials: {
-      client_email: clientEmail,
-      private_key: privateKey.replace(/\\n/g, '\n'),
-    },
+  const auth = new google.auth.JWT({
+    email,
+    key,
     scopes: ['https://www.googleapis.com/auth/calendar.readonly'],
   });
 
-  // ✅ FIX: pass auth directly (NOT authClient)
-  return google.calendar({
-    version: 'v3',
-    auth,
-  });
+  try {
+    await auth.authorize();
+  } catch (authErr: any) {
+    console.error('[calendar] auth.authorize() failed');
+    console.error('[calendar] auth error message:', authErr?.message);
+    console.error('[calendar] auth error code:', authErr?.code);
+    console.error('[calendar] auth error response:', JSON.stringify(authErr?.response?.data ?? null));
+    throw authErr;
+  }
+
+  return google.calendar({ version: 'v3', auth });
 }
