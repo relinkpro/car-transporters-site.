@@ -7,10 +7,7 @@ export async function POST(req: NextRequest) {
   try {
     const { trailerId, startDate, endDate } = await req.json();
 
-    // Diagnostic: confirm what the handler receives and what env vars are live
-    console.log('[availability] trailerId received:', JSON.stringify(trailerId));
-    console.log('[availability] TRAILER_1_CALENDAR_ID set:', !!process.env.TRAILER_1_CALENDAR_ID);
-    console.log('[availability] TRAILER_2_CALENDAR_ID set:', !!process.env.TRAILER_2_CALENDAR_ID);
+    console.log('[availability] trailerId received:', trailerId);
 
     if (!trailerId || !startDate || !endDate) {
       return NextResponse.json(
@@ -19,15 +16,33 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Evaluated inside the handler so it always reads live env vars
+    if (endDate < startDate) {
+      return NextResponse.json(
+        { error: 'End date must be after start date.' },
+        { status: 400 }
+      );
+    }
+
     const calendarMap: Record<string, string | undefined> = {
       'trailer-1': process.env.TRAILER_1_CALENDAR_ID,
       'trailer-2': process.env.TRAILER_2_CALENDAR_ID,
     };
 
+    console.log(
+      '[availability] TRAILER_1_CALENDAR_ID set:',
+      !!process.env.TRAILER_1_CALENDAR_ID
+    );
+    console.log(
+      '[availability] TRAILER_2_CALENDAR_ID set:',
+      !!process.env.TRAILER_2_CALENDAR_ID
+    );
+
     const calendarId = calendarMap[trailerId];
 
-    console.log('[availability] resolved calendarId:', calendarId ? 'found' : 'undefined');
+    console.log(
+      '[availability] resolved calendarId:',
+      calendarId ? 'found' : 'missing'
+    );
 
     if (!calendarId) {
       return NextResponse.json(
@@ -36,37 +51,71 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const calendar = await getCalendarClient();
+    // Stage: Google auth — isolated so auth failures are distinct from calendar errors
+    let calendar: Awaited<ReturnType<typeof getCalendarClient>>;
+    try {
+      calendar = await getCalendarClient();
+      console.log('[availability] getCalendarClient() succeeded');
+    } catch (authErr: any) {
+      const googleErr = authErr?.response?.data?.error ?? null;
+      console.error('[availability] AUTH STAGE failed:', authErr?.message);
+      return NextResponse.json(
+        {
+          error: 'Google authentication failed.',
+          stage: 'auth',
+          details: authErr?.message ?? 'Unknown auth error',
+          code: authErr?.code ?? null,
+          apiError: googleErr,
+        },
+        { status: 500 }
+      );
+    }
 
+    // Stage: calendar.events.list — isolated so permission/sharing errors are distinct
     const timeMin = new Date(`${startDate}T00:00:00`).toISOString();
     const timeMax = new Date(`${endDate}T23:59:59`).toISOString();
 
-    const response = await calendar.events.list({
-      calendarId,
-      timeMin,
-      timeMax,
-      singleEvents: true,
-      orderBy: 'startTime',
-    });
+    console.log('[availability] calling events.list for calendarId:', calendarId);
 
-    const events = response.data.items || [];
+    let available = false;
+    try {
+      const response = await calendar.events.list({
+        calendarId,
+        timeMin,
+        timeMax,
+        singleEvents: true,
+        orderBy: 'startTime',
+      });
+      console.log('[availability] events.list succeeded');
+      available = (response.data.items ?? []).length === 0;
+    } catch (calErr: any) {
+      const googleErr = calErr?.response?.data?.error ?? null;
+      console.error('[availability] CALENDAR STAGE failed:', calErr?.message);
+      console.error('[availability] calendar error status:', googleErr?.status);
+      console.error('[availability] calendar error message:', googleErr?.message);
+      return NextResponse.json(
+        {
+          error: 'Google Calendar lookup failed.',
+          stage: 'events.list',
+          details: calErr?.message ?? 'Unknown calendar error',
+          code: calErr?.code ?? googleErr?.code ?? null,
+          apiError: googleErr,
+        },
+        { status: 500 }
+      );
+    }
 
-    return NextResponse.json({
-      available: events.length === 0,
-    });
+    return NextResponse.json({ available });
   } catch (error: any) {
-    console.error('[availability] FULL ERROR:', error);
-    console.error('[availability] error.message:', error?.message);
-    console.error('[availability] error.code:', error?.code);
-    console.error('[availability] error.response.data:', JSON.stringify(error?.response?.data ?? null));
-
+    // Fallback for unexpected errors outside the staged blocks
+    console.error('[availability] unexpected error:', error?.message);
     return NextResponse.json(
       {
-        error: 'Failed to check availability.',
-        details: error?.message,
-        // googleapis wraps the real API error in error.response.data, not error.message
-        apiError: error?.response?.data?.error?.message ?? error?.errors?.[0]?.message ?? null,
+        error: 'Unexpected error checking availability.',
+        stage: 'unknown',
+        details: error?.message ?? 'Unknown error',
         code: error?.code ?? null,
+        apiError: error?.response?.data?.error ?? null,
       },
       { status: 500 }
     );

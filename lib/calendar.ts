@@ -15,7 +15,16 @@ export async function getCalendarClient() {
     );
   }
 
-  const key = rawKey.replace(/\\n/g, '\n');
+  const key = rawKey
+    .replace(/^["']|["']$/g, '') // strip surrounding quotes if accidentally included when adding to Vercel
+    .replace(/\\n/g, '\n')        // convert literal \n to real newlines
+    .trim();
+
+  // Verify key shape after processing — catches quote-stripping failures and bad formatting
+  console.log('[calendar] key first 30 chars:', JSON.stringify(key.slice(0, 30)));
+  console.log('[calendar] key last 30 chars:', JSON.stringify(key.slice(-30)));
+  console.log('[calendar] key has valid PEM header:', key.startsWith('-----BEGIN PRIVATE KEY-----'));
+  console.log('[calendar] key has valid PEM footer:', key.includes('-----END PRIVATE KEY-----'));
 
   const auth = new google.auth.JWT({
     email,
@@ -25,8 +34,9 @@ export async function getCalendarClient() {
 
   try {
     await auth.authorize();
+    console.log('[calendar] auth.authorize() succeeded');
   } catch (authErr: any) {
-    console.error('[calendar] auth.authorize() failed');
+    console.error('[calendar] auth.authorize() FAILED');
     console.error('[calendar] auth error message:', authErr?.message);
     console.error('[calendar] auth error code:', authErr?.code);
     console.error('[calendar] auth error response:', JSON.stringify(authErr?.response?.data ?? null));
